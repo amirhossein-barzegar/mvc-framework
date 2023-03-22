@@ -1,0 +1,107 @@
+                $uri = substr_replace($uri,"/",0,0);
+            }
+            self::$uri = $uri;
+            self::$uris[$uri] = null;
+            $action = explode('@',$action);
+            $controller = $action[0];
+            $controllerName = 'App\Controllers\\'.$controller;
+            $method = end($action);
+            self::$request_uri = $_SERVER['REQUEST_URI'];
+            if (self::$request_uri == $uri) {
+                require_once 'App/Controllers/'.$controller.'.php';
+                $instance = new $controllerName;
+                call_user_func([$instance,$method]);
+                return new self;
+            } elseif (key_exists($uri,self::$uris)) {
+
+                if (str_contains($uri,'{')) {
+                    if (substr_count($uri,"/") == substr_count(self::$request_uri,"/")) {
+                        $exp_open_bracket = explode('{',$uri);
+                        $paramIndex = 0;
+                        foreach($exp_open_bracket as $open_bracket) 
+                        {
+                            if (str_contains($open_bracket, "}")) {
+                                $exp_close_bracket = explode('}',$open_bracket);
+
+                                foreach($exp_close_bracket as $exp_item)
+                                {
+                                    if(strlen($exp_item) == 0) continue;
+                                    dumper($exp_item);
+                                    if(!str_contains($exp_item,'/')) {
+                                        // don't have / sign
+                                        self::$uriParamsKeys[] = $exp_item;
+                                        // dumper($exp_item);
+                                    } else {
+                                        // have / sign
+                                        $paramIndex += strlen($exp_item);
+                                    }
+                                }
+                            } else {
+                                // don't have any } sign
+                                // dumper($open_bracket.' not contains');
+                                $paramIndex += strlen($open_bracket);
+
+                                $remindUri = substr(self::$request_uri,$paramIndex);
+                                if (str_contains($remindUri,'/')) {
+                                    $paramVal = explode('/',$remindUri)[0];
+                                    $paramIndex += strlen($paramVal);
+                                } else {
+                                    $paramVal = $remindUri;
+                                    $paramIndex += strlen($paramVal);
+                                }
+                                if (strlen($paramVal) > 0)
+                                self::$uriParamsValues[] = $paramVal;
+                                dumper($paramVal);
+                            }
+                        }
+                    }
+                    require_once 'App/Controllers/'.$controller.'.php';
+                    $instance = new $controllerName;
+                    if (isset(self::$uriParamsValues)) {
+                        call_user_func([$instance,$method],...self::$uriParamsValues);
+                    }
+                    return new self;
+                }
+                // dumper($uri);
+                dumper('*******************************');
+                return;
+                /*
+
+if (str_contains($uri,'{')) {
+    $exp_open_bracket = explode('{',$uri);
+    $paramIndex = 0;
+    foreach($exp_open_bracket as $open_bracket) {
+        $exp_close_bracket = explode('}',$open_bracket);
+        foreach($exp_close_bracket as $key=>$param) {
+            if (strlen($param) == 0) continue;
+            if (str_contains($param,"/")) {
+                $paramIndex += strlen($param);
+                $remindUri = substr(self::$request_uri,$paramIndex);
+                
+                if (str_contains($remindUri,'/')) {
+                    $paramVal = explode('/',$remindUri)[0];
+                    $paramIndex += strlen($paramVal);
+                } else {
+                    $paramVal = $remindUri;
+                    $paramIndex += strlen($paramVal);
+                }
+                self::$uriParamsValues[] = $paramVal;
+            } else {
+                self::$uriParamsKeys[] = $param;
+            }
+        }
+    }
+    foreach(self::$uriParamsValues as $key=>$paramValue) {
+        if (str_contains($uri,self::$uriParamsKeys[$key])){
+            self::$uriParams[self::$uriParamsKeys[$key]] = $paramValue;
+        }
+    }
+    require_once 'App/Controllers/'.$controller.'.php';
+    $instance = new $controllerName;
+    call_user_func([$instance,$method],...self::$uriParamsValues);
+    return new self;
+    
+} else {
+    return new self;
+}
+                */
