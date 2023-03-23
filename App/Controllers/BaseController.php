@@ -8,7 +8,8 @@ class BaseController {
     }
 }
 
-function view(string $view,string|array $params = null) { 
+function view(string $view,string|array $params = null):void
+{
     if (is_array($params)) {
         foreach($params as $key=>$value) {
             ${$key} = $value;

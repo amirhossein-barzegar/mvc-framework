@@ -23,27 +23,29 @@ class HomeController extends BaseController {
     public function postLogin(FormRequest $request) {
 
         $request->rules = [
-            'name' => 'required|min:5'
+            'name' => 'required|min:5',
+            'lastname' => 'required'
         ];
 
         $request->validate($request->request);
+
+        echo "post User";
+        dd($request);
     }
 
-    public function getUser($id){
-        echo $id;
-    }
-
-    public function postUser(FormRequest $request,$id,$stuff,$some) {
-        dumper($request);
-        dumper($id);
-        dumper($stuff);
+    public function postUser(FormRequest $request,$id, $name) {
+        dd($request, $id, $name);
     }
 
     public function showUser($id, $roleId) {
-        echo "show User Method id is $id and roleId is $roleId";
+        echo "show User Method id is $id and roleId is $roleId"."<br/>";
     }
 
     public function showPost($postId) {
-        echo "showPost() $postId";
+        echo "showPost() $postId"."<br/>";
+    }
+
+    public function some($some) {
+        echo "Some method $some param"."<br/>";
     }
 }

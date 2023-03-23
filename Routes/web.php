@@ -11,5 +11,16 @@ Route::post('/register', 'HomeController@postLogin');
 
 Route::get("/user/{id}/role/{roleId}", "HomeController@showUser");
 Route::get("/post/{postId}", "HomeController@showPost");
+Route::post("/user/{id}/{name}", "HomeController@postUser");
 
 
+
+
+
+
+
+
+
+
+Route::execute();
+?>

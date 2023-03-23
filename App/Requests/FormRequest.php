@@ -48,6 +48,7 @@ class FormRequest {
         if (strlen($request[$fieldName]) < $length) {
             $_SESSION['errors'][$fieldName] = "Minimum length for {$fieldName} field is {$length} characters";
             $_SESSION['requests'] = $request;
+            $_SESSION['PAGE_URI_SESSION'] = $_SERVER['HTTP_REFERER'];
             return false;
         } else {
             return true;
@@ -57,14 +58,15 @@ class FormRequest {
     /**
      * Redirect to previous route
      */
-    public function redirectBack() {
-        header('Location: ' . $_SERVER['HTTP_REFERER']);
+    public function redirectBack(): void
+    {
+        if (isset($_SERVER['REQUEST_URI'])) header('Location: ' . $_SERVER['HTTP_REFERER']);
     }
 
     /**
      * Run all defined rules
      */
-    public function runRules($rules,$request)
+    public function runRules($rules,$request): void
     {
         foreach($rules as $fieldName=>$rule):
         $rule_scopes = array_reverse(explode('|',$rule));
@@ -79,9 +81,8 @@ class FormRequest {
                     $method = $scope;
                     $result = call_user_func([$this,$method],$request,$fieldName);
                 }
-
                 // If validation rule return false redirect back...
-                if ($result === false) {
+                if ($result === false || isset($_SESSION['errors'])) {
                     $this->redirectBack();
                 }
             endforeach;
