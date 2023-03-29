@@ -13,3 +13,5 @@ function dumper(...$stuffs): void
 require __DIR__ . '/vendor/autoload.php';
 
 require 'Routes/web.php';
+use App\Models\Migration;
+new Migration();

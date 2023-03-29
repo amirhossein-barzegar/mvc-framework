@@ -212,17 +212,31 @@ class Route {
         }
     }
 
-    public static function sendResponse($request = null,$params = []): self
+    public static function sendResponse($request = null, $params = []): self
     {
-        require_once 'App/Controllers/' . self::$controller . '.php';
-        $instance = new self::$controllerName;
-        if (isset($params)) {
-            if (isset($request)) call_user_func([$instance, self::$method],$request,...$params);
-            else call_user_func([$instance,self::$method],...$params);
+        $fileName = 'App/Controllers/' . self::$controller . '.php';
+        if (file_exists($fileName)) {
+            require_once $fileName;
+            $instance = new self::$controllerName;
+            if (isset($params)) {
+                if (method_exists($instance, self::$method)) {
+                    if (isset($request)) call_user_func([$instance, self::$method],$request,...$params);
+                    else call_user_func([$instance,self::$method],...$params);
+                } else {
+                    throw new \Exception('Unknown Method : ');
+                }
+            } else {
+                if (method_exists($instance, self::$method)) {
+                    if (isset($request)) call_user_func([$instance, self::$method],$request);
+                    else call_user_func([$instance,self::$method]);
+                } else {
+                    throw new \Exception('Unknown Method : ');
+                }
+            }
         } else {
-            if (isset($request)) call_user_func([$instance, self::$method],$request);
-            else call_user_func([$instance,self::$method]);
+            throw new \Exception("Class Not Found : ");
         }
+
         return new self;
     }
 

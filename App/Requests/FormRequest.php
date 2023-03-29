@@ -4,24 +4,20 @@ namespace App\Requests;
 
 class FormRequest {
     public array $rules = [];
+    
     public function __construct(
-        /**
-         * Form post request
-         */
         public array $request
     ) 
     {}
 
     /**
-     * 
+     * Validate request with our custom rules
+     *
      * @param array $request
      * @return void
      */
     public function validate(array $request) : void 
     {
-        // if (!empty($_SESSION)) {
-        //     $this->redirectBack();
-        // }
         session_unset(); 
         $this->runRules($this->rules,$request);
     }
@@ -48,7 +44,6 @@ class FormRequest {
         if (strlen($request[$fieldName]) < $length) {
             $_SESSION['errors'][$fieldName] = "Minimum length for {$fieldName} field is {$length} characters";
             $_SESSION['requests'] = $request;
-            $_SESSION['PAGE_URI_SESSION'] = $_SERVER['HTTP_REFERER'];
             return false;
         } else {
             return true;
@@ -57,19 +52,26 @@ class FormRequest {
 
     /**
      * Redirect to previous route
+     *
+     * @return void
      */
     public function redirectBack(): void
     {
-        if (isset($_SERVER['REQUEST_URI'])) header('Location: ' . $_SERVER['HTTP_REFERER']);
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
+        exit;
     }
 
     /**
      * Run all defined rules
+     *
+     * @param array $rules
+     * @param array $request
+     * @return void
      */
-    public function runRules($rules,$request): void
+    public function runRules(array $rules,array $request): void
     {
         foreach($rules as $fieldName=>$rule):
-        $rule_scopes = array_reverse(explode('|',$rule));
+        $rule_scopes = explode('|',$rule);
             foreach($rule_scopes as $scope):
                 $result = false;
                 if (str_contains($scope,':')) {

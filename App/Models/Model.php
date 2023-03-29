@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
-use App\Models\Migration;
+use App\Traits\ModelTrait;
+use Config\DB;
 
-class Model extends Migration
+class Model extends DB
 {
-  public function __construct()
-  {
-  }
+    use ModelTrait;
 }
