@@ -153,6 +153,124 @@ class Route {
         }
         return new self;
     }
+    
+    /**
+     * Handle Get Api Route
+     * @param string $uri
+     * @param string $action
+     * @return Route
+     */
+    public static function getApi(string $uri, string $action): self
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+            header("Access-Control-Allow-Origin: *");
+            header("Content-Type: application/json; charset=UTF-8");
+            header("Access-Control-Allow-Methods: GET");
+            header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+            // add / to begin of the uri
+            if ($uri[0] != "/"){
+                self::$uri = "/api/" . $uri;
+            } else {
+                self::$uri = "/api" . $uri;
+            }
+            
+            if (!str_ends_with(self::$uri, '/')) {
+                self::$uri = self::$uri . '/';
+            }
+            
+            $action = explode('@',$action);
+            self::$controller = $action[0];
+            self::$controllerName = 'App\Controllers\\'.self::$controller;
+            self::$method = end($action);
+            
+            // should have / in begin of uri
+            if ($_SERVER['REQUEST_URI'][0] != "/"){
+                self::$request_uri  = substr_replace($_SERVER['REQUEST_URI'],"/",0,0);
+            } else {
+                self::$request_uri = $_SERVER['REQUEST_URI'];
+            }
+            
+            // should have / in end of uri
+            if (!str_ends_with(self::$request_uri, "/")){
+                self::$request_uri[strlen(self::$request_uri)] = "/";
+            }
+            
+            // Add current uri to web uris list
+            if (str_contains(self::$uri,'{')) {
+                self::generateFakeUri(self::$uri);
+                if (isset(self::$fakeUris)) {
+                    self::$uris[self::$fakeUris[self::$fakeUriKey]] = null;
+                }
+            } else {
+                self::$uris[self::$uri] = null;
+            }
+            
+            self::checkAndSendResponse();
+            
+            return new self;
+        }
+        return new self;
+    }
+    
+    /**
+     * Handle Post Route
+     */
+    public static function postApi(string $uri, string $action): self
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST')
+        {
+            header("Access-Control-Allow-Origin: *");
+            header("Content-Type: application/json; charset=UTF-8");
+            header("Access-Control-Allow-Methods: POST");
+            header("Access-Control-Max-Age: 3600");
+            header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+            // add / to begin of the uri
+            if ($uri[0] != "/"){
+                self::$uri = "/api/" . $uri;
+            } else {
+                self::$uri = "/api" . $uri;
+            }
+            
+            if (!str_ends_with(self::$uri, '/')) {
+                self::$uri = self::$uri . '/';
+            }
+            
+            $action = explode('@',$action);
+            self::$controller = $action[0];
+            self::$controllerName = 'App\Controllers\\'.self::$controller;
+            self::$method = end($action);
+            self::$request_uri = $_SERVER['REQUEST_URI'];
+            
+            // should have / in begin of uri
+            if ($_SERVER['REQUEST_URI'][0] != "/"){
+                self::$request_uri  = substr_replace($_SERVER['REQUEST_URI'],"/",0,0);
+            } else {
+                self::$request_uri = $_SERVER['REQUEST_URI'];
+            }
+            
+            // should have / in end of uri
+            if (!str_ends_with(self::$request_uri, "/")){
+                self::$request_uri = self::$request_uri . "/";
+            }
+            // Add current uri to web uris list
+            if (str_contains(self::$uri,'{')) {
+                $values = [];
+                $values = self::generateFakeUri(self::$uri);
+                self::$uriParamsValues = $values;
+                if (isset(self::$fakeUris)) {
+                    self::$uris[self::$fakeUris[self::$fakeUriKey]] = null;
+                }
+            } else {
+                self::$uris[self::$uri] = null;
+            }
+
+            $request = new FormRequest((array) json_decode(file_get_contents("php://input")));
+            self::checkAndSendResponse(request: $request, values: self::$uriParamsValues);
+            
+            return new self;
+        }
+        return new self;
+    }
 
     # Generate fake uri
     public static function generateFakeUri(): array

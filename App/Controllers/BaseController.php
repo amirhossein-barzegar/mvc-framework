@@ -6,6 +6,13 @@ class BaseController {
     public function __construct() {
     }
     
+    /**
+     * Show view file with params
+     * @param string $view
+     * @param string|array|null $params
+     *
+     * @return void
+     */
     protected function view(string $view,string|array $params = null): void
     {
         if (is_array($params)) {
@@ -27,6 +34,19 @@ class BaseController {
         } catch(\Exception $e) {
             echo $e->getMessage();
         }
+    }
+    
+    /**
+     * Return response data with status code
+     * @param array $data
+     * @param int $status_code
+     *
+     * @return void
+     */
+    public function response(array $data,int $status_code = 200): void
+    {
+        http_response_code($status_code);
+        echo json_encode($data);
     }
 }
 

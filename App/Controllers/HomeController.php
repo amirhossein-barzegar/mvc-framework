@@ -16,6 +16,6 @@ class HomeController extends BaseController {
             'lastname' => 'required'
         ];
 
-        $request->validate($request->request);
+        $request->validate($request);
     }
 }

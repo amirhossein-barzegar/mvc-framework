@@ -72,7 +72,7 @@ trait ModelTrait {
      *
      * @return array|static
      */
-    public static function findById(int $id, array|string $relations): static|array
+    public static function findById(int $id, array|string $relations = ''): static|array
     {
         $connection = static::connection();
         $stmt = $connection->prepare("SELECT * FROM ".static::$table." WHERE id = :id");
@@ -127,6 +127,34 @@ trait ModelTrait {
         return $model;
     }
     
+    /**
+     * Create new record for model table
+     */
+    public static function create(array $data) {
+        $connection = static::connection();
+        $questionMarkHolders = "";
+        foreach(array_values($data) as $index=>$d)
+        {
+            if (count($data) > $index+1) $questionMarkHolders.= "?, ";
+            else $questionMarkHolders.= "?";
+        }
+        $stmt = $connection->prepare("INSERT INTO " . static::$table . " (" . implode(', ',array_keys($data)) . ") VALUES ($questionMarkHolders)");
+        return $stmt->execute(array_values($data));
+    }
+    
+    public function delete()
+    {
+        $connection = static::connection();
+        $stmt = $connection->prepare("DELETE FROM " . static::$table . " WHERE id = ?");
+        return $stmt->execute([self::$fetchObject->id]);
+    }
+    
+    public function edit(array $data): bool
+    {
+        $connection = static::connection();
+        $stmt = $connection->prepare("UPDATE " . static::$table . " SET " . implode(' = ?, ',array_keys($data)) . " = ? WHERE id = " . self::$fetchObject->id);
+        return $stmt->execute(array_values($data));
+    }
     
     
     

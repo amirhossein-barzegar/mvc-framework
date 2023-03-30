@@ -16,10 +16,10 @@ class FormRequest {
      * @param array $request
      * @return void
      */
-    public function validate(array $request) : void 
+    public function validate(FormRequest $request) : void
     {
         session_unset(); 
-        $this->runRules($this->rules,$request);
+        $this->runRules($this->rules,$request->request);
     }
 
     /**
@@ -57,8 +57,16 @@ class FormRequest {
      */
     public function redirectBack(): void
     {
-        header('Location: ' . $_SERVER['HTTP_REFERER']);
-        exit;
+        if (isset($_SERVER['HTTP_REFERER'])) {
+            header('Location: ' . $_SERVER['HTTP_REFERER']);
+            exit;
+        } else {
+            http_response_code(403);
+            die(json_encode([
+                'error' => $_SESSION['errors'],
+                'message' => 'Validation Error'
+            ]));
+        }
     }
 
     /**
