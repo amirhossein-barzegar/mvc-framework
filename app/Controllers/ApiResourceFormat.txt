@@ -1,0 +1,59 @@
+    /**
+     * Get list of all ... (GET)
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     */
+    public function all(Request $request, Response $response): Response
+    {
+        //
+        return $response;
+    }
+
+    /**
+     * Create new ... (POST)
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     */
+    public function create(Request $request, Response $response): Response
+    {
+        //
+        return $response;
+    }
+
+    /**
+     * Show specific ... (GET)
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     */
+    public function show(Request $request, Response $response): Response
+    {
+        //
+        return $response;
+    }
+
+    /**
+     * Update specific ... (PUT)
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     */
+    public function update(Request $request, Response $response): Response
+    {
+        //
+        return $response;
+    }
+
+    /**
+     * Delete specific ... (DELETE)
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     */
+    public function delete(Request $request, Response $response): Response
+    {
+        //
+        return $response;
+    }
